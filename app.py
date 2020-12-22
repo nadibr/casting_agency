@@ -90,7 +90,7 @@ def create_app(test_config=None):
                     movie.release_date = updated_release_date
                 movie.update()
             else:
-                print(id)
+                #print(id)
                 abort(404)
             return jsonify({
                 'success': True,

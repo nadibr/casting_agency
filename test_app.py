@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -6,13 +7,9 @@ from flask_sqlalchemy import SQLAlchemy
 from app import create_app
 from models import setup_db, db, Movie, Actor, Role
 
-DB_HOST = os.getenv('DB_HOST', '127.0.0.1:5432')
-DB_USER = os.getenv('DB_USER', 'postgres')
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'password')
-DB_NAME = os.getenv('DB_NAME', 'castagency')
 
-DB_PATH = 'postgresql+psycopg2://{}:{}@{}/{}'.format(DB_USER, DB_PASSWORD, DB_HOST, DB_NAME)
-
+load_dotenv()
+db_path = os.getenv('DATABASE_URL')
 
 class CastingAgencyTestCase(unittest.TestCase):
     """This class represents the Casting Agency test case"""
@@ -22,7 +19,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
 
-        setup_db(self.app, DB_PATH)
+        setup_db(self.app, db_path)
 
         # binds the app to the current context
         with self.app.app_context():
@@ -57,65 +54,120 @@ class CastingAgencyTestCase(unittest.TestCase):
         """Executed after each test"""
         pass
 
-    # def test_add_movie(self):
-    #     res = self.client().post('/movies', headers=[
-    #             ('Content-Type', 'application/json'),
-    #             ('Authorization', f'Bearer {self.payload}')
-    #         ],json=self.new_movie)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(data['success'], True)
-    #
-    # def test_add_actor(self):
-    #     res = self.client().post('/actors', headers=[
-    #             ('Content-Type', 'application/json'),
-    #             ('Authorization', f'Bearer {self.payload}')
-    #         ], json=self.new_actor)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(data['success'], True)
+    def test_add_movie(self):
+        res = self.client().post('/movies', headers=[
+                ('Content-Type', 'application/json'),
+                ('Authorization', f'Bearer {self.payload}')
+            ],json=self.new_movie)
+        data = json.loads(res.data)
 
-    # def test_get_movies(self):
-    #     res = self.client().get('/movies', headers=[
-    #                 ('Content-Type', 'application/json'),
-    #                 ('Authorization', f'Bearer {self.payload}')
-    #             ])
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(data['movies'], True)
-    #
-    # def test_get_actors(self):
-    #     res = self.client().get('/actors', headers=[
-    #                 ('Content-Type', 'application/json'),
-    #                 ('Authorization', f'Bearer {self.payload}')
-    #             ])
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(data['actors'], True)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'], True)
 
-    # def test_edit_movie(self):
-    #     res = self.client().patch('/movies/8', headers=[
-    #                 ('Content-Type', 'application/json'),
-    #                 ('Authorization', f'Bearer {self.payload}')
-    #             ], json=self.edited_movie)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(data['movie'], True)
+    def test_400_add_movie(self):
+        res = self.client().post('/movies', headers=[
+                ('Content-Type', 'application/json'),
+                ('Authorization', f'Bearer {self.payload}')
+            ],json=json.dumps({'movie': 'wont load'}))
+        data = json.loads(res.data)
 
-    # def test_edit_movie(self):
-    #     res = self.client().patch('/actors/6', headers=[
-    #                 ('Content-Type', 'application/json'),
-    #                 ('Authorization', f'Bearer {self.payload}')
-    #             ], json=self.edited_actor)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(data['actor'], True)
+        self.assertEqual(res.status_code, 400)
+
+
+    def test_add_actor(self):
+        res = self.client().post('/actors', headers=[
+                ('Content-Type', 'application/json'),
+                ('Authorization', f'Bearer {self.payload}')
+            ], json=self.new_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'], True)
+
+    def test_400_add_actor(self):
+        res = self.client().post('/actors', headers=[
+                ('Content-Type', 'application/json'),
+                ('Authorization', f'Bearer {self.payload}')
+            ], json=json.dumps({'actor': 'wont load'}))
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+
+    def test_get_movies(self):
+        res = self.client().get('/movies', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ])
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['movies'], True)
+
+    def test_400_get_movies(self):
+        res = self.client().get('/movies', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ])
+        data = json.loads(res.data)
+
+        self.assertNotEqual(res.status_code, 400)
+
+    def test_get_actors(self):
+        res = self.client().get('/actors', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ])
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['actors'], True)
+
+    def test_400_get_actors(self):
+        res = self.client().get('/actors', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ])
+        data = json.loads(res.data)
+
+        self.assertNotEqual(res.status_code, 400)
+
+    def test_edit_movie(self):
+        res = self.client().patch('/movies/8', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ], json=self.edited_movie)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['movie'], True)
+
+    def test_400_edit_movie(self):
+        res = self.client().patch('/movies/1000', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ], json=self.edited_movie)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+
+    def test_edit_actor(self):
+        res = self.client().patch('/actors/6', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ], json=self.edited_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['actor'], True)
+
+    def test_400_edit_actor(self):
+        res = self.client().patch('/actors/1000', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ], json=self.edited_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
 
     def test_delete_movie(self):
         res = self.client().delete('/movies/8', headers=[
@@ -127,6 +179,15 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['movie'], True)
 
+    def test_400_delete_movie(self):
+        res = self.client().delete('/movies/1000', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ])
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+
     def test_delete_actor(self):
         res = self.client().delete('/actors/6', headers=[
                     ('Content-Type', 'application/json'),
@@ -136,6 +197,15 @@ class CastingAgencyTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['actor'], True)
+
+    def test_400_delete_actor(self):
+        res = self.client().delete('/actors/6', headers=[
+                    ('Content-Type', 'application/json'),
+                    ('Authorization', f'Bearer {self.payload}')
+                ])
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
 
 
 # Run tests
