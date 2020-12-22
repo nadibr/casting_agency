@@ -8,13 +8,14 @@ from flask_sqlalchemy import SQLAlchemy
 # DB_NAME = os.getenv('DB_NAME', 'castagency')
 
 # DB_PATH = 'postgresql+psycopg2://{}:{}@{}/{}'.format(DB_USER, DB_PASSWORD, DB_HOST, DB_NAME)
-DB_PATH='postgresql://postgres:password@localhost:5432/castagency'
+DB_PATH = 'postgresql://postgres:password@localhost:5432/castagency'
 
+DATABASE_URL = 'postgres://rvcvvxcwiexiuv:87016bf027cf5e87f25e4d3b2ba6e6e42c34b00cd443947547ae0365e11f5eae@ec2-3-211-167-220.compute-1.amazonaws.com:5432/d6250asughmup8'
 
 db = SQLAlchemy()
 
 
-def setup_db(app, database_path=DB_PATH):
+def setup_db(app, database_path=DATABASE_URL):
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
