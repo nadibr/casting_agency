@@ -14,6 +14,10 @@ def create_app(test_config=None):
     migrate = Migrate(app, db)
     CORS(app)
 
+    @app.route('/')
+    def index():
+        return 'Hello!'
+
     @app.route('/movies', methods=['GET'])
     @requires_auth('get:movies')
     def get_movies(payload):
