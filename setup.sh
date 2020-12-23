@@ -1,1 +1,1 @@
-export DATABASE_URL='postgresql://postgres:password@localhost:5432/castagency'
+export DATABASE_URL='postgresql://postgres:password@localhost:5432/CA'
