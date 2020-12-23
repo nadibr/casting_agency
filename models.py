@@ -1,18 +1,10 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import Column, String, Integer, DateTime, VARCHAR, create_engine
+from sqlalchemy import Column, String, Integer, DateTime, VARCHAR
 from flask_sqlalchemy import SQLAlchemy
 
-# DB_HOST = os.getenv('DB_HOST', '127.0.0.1:5432')
-# DB_USER = os.getenv('DB_USER', 'postgres')
-# DB_PASSWORD = os.getenv('DB_PASSWORD', 'password')
-# DB_NAME = os.getenv('DB_NAME', 'castagency')
-
-# DB_PATH = 'postgresql+psycopg2://{}:{}@{}/{}'.format(DB_USER, DB_PASSWORD, DB_HOST, DB_NAME)
 load_dotenv()
-# DB_PATH = 'postgresql://postgres:password@localhost:5432/castingagency'
 
-# DATABASE_URL = 'postgres://rvcvvxcwiexiuv:87016bf027cf5e87f25e4d3b2ba6e6e42c34b00cd443947547ae0365e11f5eae@ec2-3-211-167-220.compute-1.amazonaws.com:5432/d6250asughmup8'
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 db = SQLAlchemy()

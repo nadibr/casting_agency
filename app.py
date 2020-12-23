@@ -1,6 +1,4 @@
-import os
 from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models import setup_db, db, Movie, Actor, Role
@@ -90,7 +88,6 @@ def create_app(test_config=None):
                     movie.release_date = updated_release_date
                 movie.update()
             else:
-                #print(id)
                 abort(404)
             return jsonify({
                 'success': True,

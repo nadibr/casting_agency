@@ -3,11 +3,16 @@ from flask import request, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-AUTH0_DOMAIN = 'dev-94v3fbw8.us.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'casting'
+auth0domain = os.getenv('AUTH0_DOMAIN')
+auth0alg = os.getenv('ALGORITHMS')
+api_audience = os.getenv('API_AUDIENCE')
+signature = os.getenv('SECRET')
+
 
 # AuthError Exception
 class AuthError(Exception):
@@ -51,13 +56,9 @@ def get_token_auth_header():
 
 '''
     @INPUTS
-        permission: string permission (i.e. 'post:drink')
+        permission: string permission (i.e. 'post:movie')
         payload: decoded jwt payload
 
-    it raise an AuthError if permissions are not included in the payload
-        !!NOTE check your RBAC settings in Auth0
-    it raise an AuthError if the requested permission string is not in the payload permissions array
-    returns true otherwise
 '''
 
 
@@ -89,7 +90,7 @@ def check_permissions(permission, payload):
 
 
 def verify_decode_jwt(token):
-    jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    jsonurl = urlopen(f'https://{auth0domain}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
     unverified_header = jwt.get_unverified_header(token)
     rsa_key = {}
@@ -113,9 +114,9 @@ def verify_decode_jwt(token):
             payload = jwt.decode(
                 token,
                 rsa_key,
-                algorithms=ALGORITHMS,
-                audience=API_AUDIENCE,
-                issuer='https://' + AUTH0_DOMAIN + '/'
+                algorithms=auth0alg,
+                audience=api_audience,
+                issuer='https://' + auth0domain + '/'
             )
 
             return payload
@@ -144,12 +145,7 @@ def verify_decode_jwt(token):
 
 '''
     @INPUTS
-        permission: string permission (i.e. 'post:drink')
-
-    it uses the get_token_auth_header method to get the token
-    it uses the verify_decode_jwt method to decode the jwt
-    it uses the check_permissions method validate claims and check the requested permission
-    returns the decorator which passes the decoded payload to the decorated method
+        permission: string permission (i.e. 'post:movie')
 '''
 
 

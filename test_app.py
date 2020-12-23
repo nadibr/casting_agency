@@ -5,11 +5,12 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 
 from app import create_app
-from models import setup_db, db, Movie, Actor, Role
+from models import setup_db
 
 
 load_dotenv()
 db_path = os.getenv('DATABASE_URL')
+
 
 class CastingAgencyTestCase(unittest.TestCase):
     """This class represents the Casting Agency test case"""
@@ -58,7 +59,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         res = self.client().post('/movies', headers=[
                 ('Content-Type', 'application/json'),
                 ('Authorization', f'Bearer {self.payload}')
-            ],json=self.new_movie)
+            ], json=self.new_movie)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -68,11 +69,10 @@ class CastingAgencyTestCase(unittest.TestCase):
         res = self.client().post('/movies', headers=[
                 ('Content-Type', 'application/json'),
                 ('Authorization', f'Bearer {self.payload}')
-            ],json=json.dumps({'movie': 'wont load'}))
+            ], json=json.dumps({'movie': 'wont load'}))
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
-
 
     def test_add_actor(self):
         res = self.client().post('/actors', headers=[

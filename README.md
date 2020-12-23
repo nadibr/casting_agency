@@ -1,7 +1,11 @@
 # Casting Agency API
-Casting Agency app allows to list actors and movies and assign actors to movies. 
-Hosted on heroku
+## Motivation
+To provide APIs that allow to list actors and movies and assign actors to movies.
 
+## Dependencies
+All dependencies are listed in the requirements.txt file. They can be installed by running 
+```bash pip install -r requirements.txt```
+This project requires Heroku client installation.
 ## Database Setup (on heroku)
 Add Postgres add-on by running:
 ```bash
@@ -15,6 +19,19 @@ Clone github project and connect it in the heroku app settings. Then push git pr
 
 ```bash
 git push heroku master
+```
+
+## Local deployment
+
+Pull the heroku database to create migration script:
+```bash
+heroku pg:pull DATABASE_URL new_local_db_name -a app_name
+```
+Then run flask db init, flask db migrate and push to heroku
+
+Procfile.Windows file is included in the project to run the app locally. Use the command:
+```bash
+heroku local web -f Procfile.windows
 ```
 
 ## Run migrations
@@ -194,6 +211,40 @@ Response:
     "success": true
 }
 ```
+## Auth0
+For authentication a third party app Auth0 is used.
+### Roles created in Auth0
+
+- Casting Assistant
+        - permissions: 
+            - get:actors
+            - get:movies
+- Casting Director
+        - permissions: 
+            - get:actors
+            - get:movies
+            - patch:actors
+            - patch:movies
+            - post:actors
+            - delete:actors
+- Executive Producer
+        - permissions: 
+            - get:actors
+            - get:movies
+            - patch:actors
+            - patch:movies
+            - post:actors
+            - post:movies
+            - delete:actors
+            - delete:movies
+
+Our app exports the following environment variables:
+- AUTH0_DOMAIN
+- ALGORITHMS
+- API_AUDIENCE
+- SECRET
+- CALLBACK_URL
+- AUTH0_CLIENT_ID
 
 ## Testing
 
